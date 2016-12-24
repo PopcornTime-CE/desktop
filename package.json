@@ -18,12 +18,12 @@
   "window": {
     "title": "Popcorn Time CE",
     "icon": "src/app/images/icon.png",
-    "toolbar": true,
-    "frame": true,
+    "toolbar": false,
+    "frame": false,
     "min_width": 960,
     "min_height": 520,
     "resizable": true,
-    "show": true,
+    "show": false,
     "position": "center"
   },
   "peerDependencies": {
