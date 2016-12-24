@@ -18,16 +18,18 @@
   "window": {
     "title": "Popcorn Time CE",
     "icon": "src/app/images/icon.png",
-    "toolbar": false,
-    "frame": false,
+    "toolbar": true,
+    "frame": true,
     "min_width": 960,
     "min_height": 520,
     "resizable": true,
-    "show": false,
+    "show": true,
     "position": "center"
   },
+  "peerDependencies": {
+    "simple-get": "2.2.5"
+  },
   "dependencies": {
-    "urijs": "^1.17.0",
     "adm-zip": "0.4.7",
     "airplay-js": "^0.2.16",
     "async": "0.9.0",
@@ -59,6 +61,7 @@
     "sanitizer": "^0.1.2",
     "semver": "^4.3.3",
     "send": "0.12.2",
+    "simple-get": "2.2.5",
     "strike-api": "0.2.0",
     "tar": "^1.0.3",
     "temp": "^0.8.1",
