@@ -169,6 +169,18 @@
             switches: '',
             subswitch: '--set-subtitle ',
             fs: '--action window/enter-fs'
+        },
+        'PotPlayerMini': {
+            type: 'DAUM\\PotPlayer',
+            switches: '',
+            subswitch: '',
+            fs: ''
+        },
+        'PotPlayerMini64': {
+            type: 'DAUM\\PotPlayer',
+            switches: '',
+            subswitch: '',
+            fs: ''
         }
     };
 
