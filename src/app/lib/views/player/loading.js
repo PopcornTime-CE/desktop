@@ -73,6 +73,15 @@
             Mousetrap.bind(['esc', 'backspace'], function (e) {
                 _this.cancelStreaming();
             });
+            Mousetrap.bind(['space'], function (e) {
+                _this.toggleStreaming();
+            });
+            Mousetrap.bind(['left'], function (e) {
+                _this.backwardStreaming();
+            });
+            Mousetrap.bind(['right'], function (e) {
+                _this.forwardStreaming();
+            });
         },
 
         unbindKeyboardShortcuts: function () {
@@ -195,6 +204,17 @@
             win.debug('Play triggered');
             App.vent.trigger('device:unpause');
             $('.play').removeClass('fa-play').removeClass('play').addClass('fa-pause').addClass('pause');
+        },
+
+        toggleStreaming: function(){
+            if($('.play').length){
+                this.resumeStreaming();
+                return;
+            }
+            if($('.pause').length){
+                this.pauseStreaming();
+                return;
+            }
         },
 
         stopStreaming: function () {
