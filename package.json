@@ -26,6 +26,9 @@
     "show": false,
     "position": "center"
   },
+  "peerDependencies": {
+    "simple-get": "2.2.5"
+  },
   "dependencies": {
     "urijs": "^1.17.0",
     "adm-zip": "0.4.7",
@@ -60,6 +63,7 @@
     "sanitizer": "^0.1.2",
     "semver": "^4.3.3",
     "send": "0.12.2",
+    "simple-get": "2.2.5",
     "strike-api": "0.2.0",
     "tar": "^1.0.3",
     "temp": "^0.8.1",
