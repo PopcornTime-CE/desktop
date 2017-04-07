@@ -1,4 +1,4 @@
-(function (App) {
+(function(App) {
     'use strict';
 
     var path = require('path');
@@ -14,10 +14,35 @@
             name: i18n.__('External Player'),
         },
 
-        play: function (streamModel) {
-            // "" So it behaves when spaces in path
+        play: function(streamModel) {
+            var options = {};
+            var args = [];
             var url = streamModel.attributes.src;
-            var cmd = path.normalize('"' + this.get('path') + '" ') + getPlayerSwitches(this.get('id')) + ' ';
+            var cmd;
+
+            if (process.platform == 'win32') {
+                // "" So it behaves when spaces in path
+                //Node.js Format: spawn('"with spaces.cmd"', ['arg with spaces'], { shell: true });
+                cmd = path.normalize('"' + this.get('path') + '"');
+                options = {
+                    shell: true
+                };
+
+            } else
+            if (process.platform == 'linux') {
+                cmd = path.normalize('' + this.get('path') + '');
+                options = {
+                    shell: true
+                };
+            } else {
+                cmd = path.normalize('"' + this.get('path') + '" ');
+            }
+
+            //var cmd = path.normalize('"' + this.get('path') + '" ');
+            //var cmd = path.normalize('' + this.get('path') + '');
+
+            args.push(getPlayerSwitches(this.get('id')));
+
             var subtitle = streamModel.attributes.subFile || '';
             if (subtitle !== '') {
 
@@ -30,27 +55,49 @@
                     var detectedEncoding = charset.encoding;
                     win.debug('Subtitles charset detected: %s', detectedEncoding);
                     if (detectedEncoding.toLowerCase() === 'utf-8') {
-                        cmd += '-utf8 ';
+                        args.push('-utf8 ');
                     }
                 }
-                cmd += getPlayerSubSwitch(this.get('id')) + '"' + subtitle + '" ';
+                args.push(getPlayerSubSwitch(this.get('id')) + '"' + subtitle + '" ');
             }
             if (getPlayerFS(this.get('id')) !== '') {
                 // Start player fullscreen if available and asked
                 if (Settings.alwaysFullscreen) {
-                    cmd += getPlayerFS(this.get('id')) + ' ';
+                    args.push(this.get('id'));
                 }
             }
             if (getPlayerFilenameSwitch(this.get('id')) !== '') {
                 // The video file is the biggest file in the torrent
-                var videoFile = _.sortBy(streamModel.attributes.torrent.info.files, function (file) {
+                var videoFile = _.sortBy(streamModel.attributes.torrent.info.files, function(file) {
                     return -file.length;
                 })[0];
-                cmd += videoFile ? (getPlayerFilenameSwitch(this.get('id')) + '"' + videoFile.name + '" ') : '';
+                args.push(videoFile ? (getPlayerFilenameSwitch(this.get('id')) + '"' + videoFile.name + '" ') : '');
             }
-            cmd += url;
-            win.info('Launching External Player: ' + cmd);
-            child.exec(cmd, function (error, stdout, stderr) {
+            args.push(url);
+
+            win.info('Launching External Player: ' + cmd + ' URL: ' + url);
+            win.info('Launching External Player Args: ' + args);
+            win.info('Launching External Player Options: ' + options);
+
+            var player = child.spawn(cmd, args, options);
+
+            player.stdout.on('data', (data) => {
+                win.info(`stdout: ${data}`);
+            });
+
+            player.stderr.on('data', (data) => {
+                win.debug(`stderr: ${data}`);
+            });
+
+            player.on('error', (data) => {
+                win.error("External Player Error" + data);
+                App.vent.trigger('player:close');
+                App.vent.trigger('stream:stop');
+                App.vent.trigger('preload:stop');
+            });
+
+            player.on('close', (code) => {
+                win.debug(`Player process exited with code ${code}`);
                 if (streamModel.attributes.device.id === 'Bomi') {
                     // don't stop on exit, because Bomi could be already running in background and the command ends while the stream should continue
                     return;
@@ -61,11 +108,11 @@
             });
         },
 
-        pause: function () {},
+        pause: function() {},
 
-        stop: function () {},
+        stop: function() {},
 
-        unpause: function () {}
+        unpause: function() {}
     });
 
     function getPlayerName(loc) {
@@ -128,7 +175,7 @@
         },
         'mpv': {
             type: 'mpv',
-            switches: '',
+            switches: '-quiet',
             subswitch: '--sub=',
             fs: '--fs'
         },
@@ -173,7 +220,7 @@
     };
 
     /* map name back into the object as we use it in match */
-    _.each(players, function (v, k) {
+    _.each(players, function(v, k) {
         players[k].name = k;
     });
 
@@ -183,7 +230,7 @@
         win32: []
     };
 
-    var addPath = function (path) {
+    var addPath = function(path) {
         if (fs.existsSync(path)) {
             searchPaths[process.platform].push(path);
         }
@@ -203,7 +250,7 @@
     var folderName = '';
     var birthtimes = {};
 
-    async.each(searchPaths[process.platform], function (folderName, pathcb) {
+    async.each(searchPaths[process.platform], function(folderName, pathcb) {
         folderName = path.resolve(folderName);
         win.info('Scanning: ' + folderName);
         var appIndex = -1;
@@ -211,9 +258,9 @@
             root: folderName,
             depth: 3
         });
-        fileStream.on('data', function (d) {
+        fileStream.on('data', function(d) {
             var app = d.name.replace('.app', '').replace('.exe', '').toLowerCase();
-            var match = _.filter(players, function (v, k) {
+            var match = _.filter(players, function(v, k) {
                 return k.toLowerCase() === app;
             });
 
@@ -240,10 +287,10 @@
                 }
             }
         });
-        fileStream.on('end', function () {
+        fileStream.on('end', function() {
             pathcb();
         });
-    }, function (err) {
+    }, function(err) {
 
         if (err) {
             win.error('External Players: scan', err);
