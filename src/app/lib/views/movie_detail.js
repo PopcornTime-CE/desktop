@@ -236,13 +236,13 @@
             if (!player.match(/[0-9]+.[0-9]+.[0-9]+.[0-9]/ig) && 
 		player=='images/icons/googlecloud-icon.png' && this.model.get('google_video')) {
 		    var google_video = new Backbone.Model({
-		        src: this.model.get('google_video'),
-		        type: 'video/mp4', 
-			techOrder: ['html5', 'flash'],
-			quality: this.model.get('quality'), //quality: 'quality unknown', //quality: false,
-			subtitle: this.model.get('subtitle'), //subtitle: null,
-			defaultSubtitle: this.subtitle_selected,
-		        title: this.model.get('title')
+                    src: this.model.get('google_video'),
+                    type: 'video/mp4', 
+                    techOrder: ['html5', 'flash'],
+                    quality: this.model.get('quality'), //quality: 'quality unknown', //quality: false,
+                    subtitle: this.model.get('subtitle'), //subtitle: null,
+                    defaultSubtitle: this.subtitle_selected,
+                    title: this.model.get('title')
 		    });
 		    var tmpPlayer = App.Device.Collection.selected.attributes.id;
 		    App.Device.Collection.setDevice('local');

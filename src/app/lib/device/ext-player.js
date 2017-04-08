@@ -29,7 +29,7 @@
                 };
 
             } else
-            if (process.platform == 'linux') {
+            if (process.platform == 'linux' || process.platform == 'darwin') {
                 cmd = path.normalize('' + this.get('path') + '');
                 options = {
                     shell: true
