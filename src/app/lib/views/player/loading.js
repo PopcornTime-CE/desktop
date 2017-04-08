@@ -86,6 +86,9 @@
 
         unbindKeyboardShortcuts: function () {
             Mousetrap.unbind(['esc', 'backspace']);
+            Mousetrap.unbind(['space']);
+            Mousetrap.unbind(['left']);
+            Mousetrap.unbind(['right']);
         },
 
         onShow: function () {
